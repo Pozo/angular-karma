@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <script type="text/javascript" src="angular.js"></script>
+  <script type="text/javascript" src="angular-resource.js"></script>
+  <script type="text/javascript">
+  	var app = angular.module('app',['ngResource']);
+	
+	/*
+	app.config(['$httpProvider', function($httpProvider) {
+        $httpProvider.defaults.useXDomain = true;
+        delete $httpProvider.defaults.headers.common['X-Requested-With'];
+		}
+	]);
+	*/
+	app.factory('LoginService', [ '$resource', function($resource) {
+		return $resource('login.json',{}, {
+			query : {
+				method: 'POST', params: {"username": '@username', "password": '@password'}
+			}
+		});
+	} ]);
+	app.controller('LoginController', ['$scope', 'LoginService', function($scope, LoginService) {
+		$scope.handleLogin = function() {
+			LoginService.query({username: $scope.username,password:$scope.password}, function(data) {
+				console.log(data);
+			});
+		};
+		//$scope.value = 'INVALID';
+		$scope.disable = true;
+		
+		$scope.$watch('username', function(val,old){
+			if(undefined != val) {
+				if($scope.validateEmail(val)) {
+					//$scope.value = 'VALID';
+					$scope.disable = false; 
+				} else {
+					//$scope.value = 'INVALID';
+					$scope.disable = true; 
+				}
+			}			
+		});
+		/*
+		#XXX : http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
+		*/
+		$scope.validateEmail = function(email){
+			var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+			return re.test(email);
+		} 
+	}]);
+  </script>
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <style type="text/css">
+	body {
+		padding:0;
+		margin:0;
+		width: 100%;
+	}
+	#login-form {
+		padding: 10em;
+		width: 400px;
+		margin-left: auto;
+		margin-right: auto;
+		text-align: center;
+	}
+	#user-login-button {
+		margin: 2em 0em 0em 13em;
+	}
+	#user-name, #user-password {
+		float: right;
+	}
+  </style>
+</head>
+
+<body>
+  <div id="login-form" ng-app="app" ng-controller="LoginController">
+    <div>
+		<span>E-mail: </span>
+		<input id="user-name" ng-model="username" type="text" />
+	
+	</div>
+	<br />
+	<div>
+		<span>Password: </span>
+		<input id="user-password" ng-model="password" type="text" />
+	</div>
+	<br />
+    <button id="user-login-button" ng-click="handleLogin()" ng-disabled="disable">Login</button>
+	<br />
+	<br />
+	<!-- <span ng-model="username">{{value}}</span> -->
+  </div>
+</body>
+</html>
