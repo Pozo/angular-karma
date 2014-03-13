@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <script type="text/javascript" src="angular.js"></script>
+  <script type="text/javascript" src="angular-resource.js"></script>
+  <script type="text/javascript">
+  	var app = angular.module('app',['ngResource']);
+	app.factory('LoginService', [ '$resource', function($resource) {
+		return $resource('login.json', {username:'everything', password:42}, function(){
+			query : {
+				method : 'POST'
+			}
+		});
+	} ]);
+	app.controller('LoginController', ['$scope', 'LoginService', function($scope, LoginService) {
+		LoginService.query({daysfromnow:730, currency:'EUR', "sessionId":"1001"}, function(data) {
+			$scope.points=data.Day;
+		});
+	}]);
+  </script>
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <style type="text/css">
+	body {
+		padding:0;
+		margin:0;
+		width: 100%;
+	}
+	#login-form {
+		padding: 10em;
+		width: 400px;
+		margin-left: auto;
+		margin-right: auto;
+		text-align: center;
+	}
+	#user-login-button {
+		margin: 2em 0em 0em 13em;
+	}
+  </style>
+</head>
+
+<body>
+  <div id="login-form" ng-app="app" ng-controller="LoginController">
+    <span>Username: </span><input id="user-name" type="text" /><br />
+	<span>Password: </span><input id="user-password" type="text" /><br />
+    <button id="user-login-button" ng-click="handleLogin()">Login</button>
+  </div>
+</body>
+</html>
